@@ -48,7 +48,7 @@ class WC_Datacap_Admin_Handler
         $payment_method = $order->get_payment_method();
 
         // bail if the order wasn't paid for with this gateway
-        if ($payment_method !== WC_DATACAP_PAYMENT_METHOD_ID || get_post_meta($order->get_id(), WC_Datacap_Gateway::META_IS_CAPTURED, true)) {
+        if ($payment_method !== WC_DATACAP_PAYMENT_METHOD_ID || $order->get_meta(WC_Datacap_Gateway::META_IS_CAPTURED, true)) {
             return $actions;
         }
 
@@ -71,7 +71,7 @@ class WC_Datacap_Admin_Handler
             $order = wc_get_order($order);
         }
 
-        if (get_post_meta($order->get_id(), WC_Datacap_Gateway::META_IS_CAPTURED, true)) {
+        if ($order->get_meta(WC_Datacap_Gateway::META_IS_CAPTURED, true)) {
             return true;
         }
 
@@ -94,9 +94,9 @@ class WC_Datacap_Admin_Handler
             return;
         }
 
-        $is_captured = get_post_meta($order_id, WC_Datacap_Gateway::META_IS_CAPTURED, true);
-        $card_token = get_post_meta($order_id, WC_Datacap_Gateway::META_DATACAP_CARD_TOKEN, true);
-        $po_number = get_post_meta($order_id, WC_Datacap_Gateway::META_DATACAP_PO_NUMBER, true);
+        $is_captured = $order->get_meta(WC_Datacap_Gateway::META_IS_CAPTURED, true);
+        $card_token = $order->get_meta(WC_Datacap_Gateway::META_DATACAP_CARD_TOKEN, true);
+        $po_number = $order->get_meta(WC_Datacap_Gateway::META_DATACAP_PO_NUMBER, true);
 
         if ($is_captured) {
             $order->add_order_note(__('This order has already been captured.', WC_DATACAP_MODULE_NAME));
@@ -127,9 +127,10 @@ class WC_Datacap_Admin_Handler
             return;
         }
 
-        update_post_meta($order_id, WC_Datacap_Gateway::META_IS_CAPTURED, '1');
-        update_post_meta($order_id, WC_Datacap_Gateway::META_TRANSACTION_ID, $response->getRefNo());
+        $order->update_meta_data(WC_Datacap_Gateway::META_IS_CAPTURED, 1);
+        $order->update_meta_data(WC_Datacap_Gateway::META_TRANSACTION_ID, $response->getRefNo());
 
         $order->add_order_note(sprintf(__('Charge complete (RefNo: %s)', WC_DATACAP_MODULE_NAME), $response->getRefNo()));
+        $order->save();
     }
 }
