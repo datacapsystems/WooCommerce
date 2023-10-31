@@ -557,7 +557,7 @@ class WC_Datacap_Gateway extends WC_Payment_Gateway_CC
         if ($this->should_auth_and_capture()) {
             $order->payment_complete($response->getRefNo());
             $order->update_meta_data(self::META_IS_CAPTURED, 1);
-            $order->add_order_note(sprintf('Charge complete (RefNo:%s)', WC_DATACAP_MODULE_NAME, $response->getRefNo()));
+            $order->add_order_note(sprintf(__('Charge complete (RefNo:%s)', WC_DATACAP_MODULE_NAME, $response->getRefNo())));
         } else {
             if ($order->has_status(array('pending', 'failed'))) {
                 wc_reduce_stock_levels($order->get_id());
